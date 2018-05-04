@@ -30,13 +30,14 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVLim2iaMP5I-JvynMT71zwHKOUOT_6xQ&callback=initMap"></script>
   <script type="text/javascript">
-  var selection = [];
+  var selection = {};
 
   function initMap() {
     var map = new google.maps.Map(document.getElementById('map'), {
-      center: new google.maps.LatLng(37.4, -77.1),
-      zoom: 7,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
+      center: new google.maps.LatLng(38.808905, -77.621940),
+      zoom: 9,
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      fullscreenControl: false
     });
 
     var layer = new google.maps.FusionTablesLayer({
@@ -65,13 +66,11 @@
         e.row.park.value;
       if (e.row.status.value == 'approved') {
         e.infoWindowHtml += "<br>Approved!" +
-          "<br><div><h3><a style=\"text-decoration:none;\" class=\"button\" role=\"button\" href=" +
-          link +
-          ">Click here to request this point</a></h3></div><br><b>latitude:</b>" +
+          "<br><div><h3></h3></div><br><b>latitude:</b>" +
           e.row.y.value +
           "<br> <b>longitude:</b> " +
           e.row.x.value +
-          "<br><button onclick=\"addSelection("+e.row.id.value+","+e.row.y.value+","+e.row.x.value+")\" >"+//
+          "<br><button class=\"button\" onclick=\"addSelection("+e.row.id.value+","+e.row.y.value+","+e.row.x.value+")\" >"+//
           "Click to add this point to your selection!"+
           "</button></div>";
       }
@@ -79,14 +78,42 @@
   }
 
   function addSelection(id,y,x) {
-    selectionobject = {'id':id,'y':y,'x':x};
-    selection.push(selectionobject);
-    document.getElementById('selectionpane').innerHTML += "<div class=\"col-md-1 selection\"><p class=\"text-center\">"+selectionobject['id']+"</p></div>";
+    if(!(id in selection)){
+      selectionobject = {'id':id,'y':y,'x':x};
+      selection[id] = selectionobject;
+      ids = '';
+      coordinates = '';
+      for(key in selection){
+        console.log(selection)
+        ids += selection[key]['id']+',';
+        coordinates += selection[key]['y']+','+selection[key]['x']+';';
+        }
+      url = "https://docs.google.com/forms/d/e/1FAIpQLSetVrMO9wYfwWjT1TeC0H5xSHz5l9fFyAPnM9RTNkihtjoe1g/viewform?usp=pp_url&entry.2092238618&entry.1556369182&entry.479301265&entry.822000149=" +
+      ids +
+      "&entry.990579594=" +
+      coordinates;
+      //console.log(url);
+      //console.log(ids);
+      document.getElementById('submit').href = url;
+      document.getElementById('selectionpane').innerHTML += "<div class=\"row-md-1 selection\"><p class=\"text-center\">"+selectionobject['id']+"</p></div>";
+      }
+    else{
+      alert("You have already selected this point")
+    }
   };
 
   google.maps.event.addDomListener(window, 'load', initMap());
 
   </script>
-  <div id="selectionpane" class="container-fluid"></div>
-  <div id="map"></div>
+  <div class="main-content">
+    <div id="map"></div>
+    <div id="selectionpane" class="container-fluid"></div>
+    <div class="submit">
+      <a id="submit" style="line-height: 50">
+        Submit
+      </a>
+    </div>
+  </div>
+  <div>
+  </div>
 </body>
